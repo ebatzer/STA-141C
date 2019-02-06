@@ -1,0 +1,680 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={R Notebook},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{R Notebook}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{}
+    \preauthor{}\postauthor{}
+    \date{}
+    \predate{}\postdate{}
+  
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(Matrix); }\KeywordTok{library}\NormalTok{(MASS); }\KeywordTok{library}\NormalTok{(factoextra)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: ggplot2
+\end{verbatim}
+
+\begin{verbatim}
+## Welcome! Related Books: `Practical Guide To Cluster Analysis in R` at https://goo.gl/13EFCZ
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyverse); }\KeywordTok{library}\NormalTok{(cluster)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- Attaching packages --------------------------------------------------------------------------- tidyverse 1.2.1 --
+\end{verbatim}
+
+\begin{verbatim}
+## v tibble  2.0.1     v purrr   0.2.5
+## v tidyr   0.8.2     v dplyr   0.7.8
+## v readr   1.3.1     v stringr 1.3.1
+## v tibble  2.0.1     v forcats 0.3.0
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts ------------------------------------------------------------------------------ tidyverse_conflicts() --
+## x tidyr::expand() masks Matrix::expand()
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+## x dplyr::select() masks MASS::select()
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{zip_file_path =}\StringTok{ "./data/award_words.zip"}
+\KeywordTok{unzip}\NormalTok{(zip_file_path)}
+
+\NormalTok{words =}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"words.csv"}\NormalTok{, }\DataTypeTok{stringsAsFactors =} \OtherTok{FALSE}\NormalTok{)}
+\NormalTok{weights =}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"weights.csv"}\NormalTok{, }\DataTypeTok{stringsAsFactors =} \OtherTok{FALSE}\NormalTok{)}
+\NormalTok{agencies =}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"agencies.csv"}\NormalTok{, }\DataTypeTok{stringsAsFactors =} \OtherTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{1. What are the advantages and disadvantages of using lookup
+tables to represent the agencies and words, compared to storing
+everything in one table?}
+
+\textbf{2. Compute the sizes of the following objects algebraically, and
+verify the sizes in R. Recall from lecture that there may be around 1 KB
+memory overhead per object, so your theoretical results will not match
+exactly.}
+
+Weight of triple representation
+
+\[ n * s_i + n * s_i + n * s_d \] \[ 145834 * (4 + 4 + 8) = 23336544\]
+
+Weight of sparse matrix \[ n * s_d + n * s_i + d * s_i \]
+\[ 145834 * 8 + 145834 * 4 + 243 * 4 = 17504880\] Weight of sparse
+matrix transpose \[ n * s_d + w * s_i + n * s_i\]
+\[ 145834 * 8 + 340216 * 4 + 145834 * 4 = 18863272\] Weight of dense
+matrix \[ w * d * s_n\] \[ (340216 * 243) * 8 = 661379904\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{n =}\StringTok{ }\KeywordTok{nrow}\NormalTok{(weights)}
+\NormalTok{w =}\StringTok{ }\KeywordTok{length}\NormalTok{(}\KeywordTok{unique}\NormalTok{(weights}\OperatorTok{$}\NormalTok{word_index))}
+\NormalTok{d =}\StringTok{ }\KeywordTok{length}\NormalTok{(}\KeywordTok{unique}\NormalTok{(weights}\OperatorTok{$}\NormalTok{agency_index))}
+\NormalTok{si =}\StringTok{ }\DecValTok{4}
+\NormalTok{sd =}\StringTok{ }\DecValTok{8}
+
+\CommentTok{# Triple rep}
+\KeywordTok{cat}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"Triple Rep Est:"}\NormalTok{, n }\OperatorTok{*}\StringTok{ }\NormalTok{(si }\OperatorTok{+}\StringTok{ }\NormalTok{si }\OperatorTok{+}\StringTok{ }\NormalTok{sd), }\StringTok{"bytes }\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Triple Rep Est: 23336544 bytes
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cat}\NormalTok{(}\StringTok{"Triple Rep Obs: "}\NormalTok{); }\KeywordTok{object.size}\NormalTok{(weights)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Triple Rep Obs:
+\end{verbatim}
+
+\begin{verbatim}
+## 23337544 bytes
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Sparse}
+\NormalTok{sm =}\StringTok{ }\KeywordTok{sparseMatrix}\NormalTok{(}\DataTypeTok{j =}\NormalTok{ weights}\OperatorTok{$}\NormalTok{agency_index, }\DataTypeTok{i =}\NormalTok{ weights}\OperatorTok{$}\NormalTok{word_index, }\DataTypeTok{x =}\NormalTok{ weights}\OperatorTok{$}\NormalTok{weight)}
+\KeywordTok{cat}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"Sparse Est:"}\NormalTok{,  n }\OperatorTok{*}\StringTok{ }\NormalTok{sd }\OperatorTok{+}\StringTok{ }\NormalTok{n }\OperatorTok{*}\StringTok{ }\NormalTok{si }\OperatorTok{+}\StringTok{ }\NormalTok{d }\OperatorTok{*}\StringTok{ }\NormalTok{si, }\StringTok{"bytes }\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Sparse Est: 17503380 bytes
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cat}\NormalTok{(}\StringTok{"Sparse Obs: "}\NormalTok{); }\KeywordTok{object.size}\NormalTok{(sm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Sparse Obs:
+\end{verbatim}
+
+\begin{verbatim}
+## 17504880 bytes
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Sparse transpose}
+\KeywordTok{cat}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"Sparse Transpose Est:"}\NormalTok{, n }\OperatorTok{*}\StringTok{ }\NormalTok{sd }\OperatorTok{+}\StringTok{ }\NormalTok{w }\OperatorTok{*}\StringTok{ }\NormalTok{si }\OperatorTok{+}\StringTok{ }\NormalTok{n }\OperatorTok{*}\StringTok{ }\NormalTok{si, }\StringTok{"bytes }\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Sparse Transpose Est: 18863272 bytes
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cat}\NormalTok{(}\StringTok{"Sparse Transpose Obs: "}\NormalTok{); }\KeywordTok{object.size}\NormalTok{(}\KeywordTok{t}\NormalTok{(sm))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Sparse Transpose Obs:
+\end{verbatim}
+
+\begin{verbatim}
+## 18864776 bytes
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Dense}
+\KeywordTok{cat}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"Dense Est:"}\NormalTok{, (w }\OperatorTok{*}\StringTok{ }\NormalTok{d) }\OperatorTok{*}\StringTok{ }\NormalTok{sd, }\StringTok{"bytes }\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Dense Est: 661379904 bytes
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cat}\NormalTok{(}\StringTok{"Dense Obs: "}\NormalTok{); }\KeywordTok{object.size}\NormalTok{(}\KeywordTok{as}\NormalTok{(sm, }\StringTok{"dgeMatrix"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Dense Obs:
+\end{verbatim}
+
+\begin{verbatim}
+## 661381080 bytes
+\end{verbatim}
+
+\textbf{3. Comment on the sizes of the objects you calculated and
+verified above. Here are some questions to get you thinking:}
+
+\begin{itemize}
+\tightlist
+\item
+  How do the sizes compare to the sparse representation on disk in ASCII
+  text, the weights.csv file?
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cat}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"File Size on Disk:"}\NormalTok{, }\KeywordTok{file.info}\NormalTok{(}\StringTok{"weights.csv"}\NormalTok{)}\OperatorTok{$}\NormalTok{size, }\StringTok{"bytes"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## File Size on Disk: 44330812 bytes
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  What is the sparsity of the matrix? (Sparsity is the number of
+  zero-valued elements divided by the total number of elements)
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cat}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"Sparsity:"}\NormalTok{, }\KeywordTok{round}\NormalTok{(((w }\OperatorTok{*}\StringTok{ }\NormalTok{d) }\OperatorTok{-}\StringTok{ }\NormalTok{n) }\OperatorTok{/}\StringTok{ }\NormalTok{(w }\OperatorTok{*}\StringTok{ }\NormalTok{d), }\DecValTok{3}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Sparsity: 0.982
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  What's the most efficient memory representation for this particular
+  data?
+\end{itemize}
+
+The sparse matrix is the most efficient memory representation for this
+particular dataset. In particular, the sparse matrix in row oriented
+format appears to be the most efficient storage method.
+
+\begin{itemize}
+\tightlist
+\item
+  Under what conditions would a different representation work better?
+  Could dense ever be better than sparse?
+\end{itemize}
+
+Dense could be better than sparse as the number of non-zero cells in the
+matrix approaches zero. In the row-organized sparse representation of
+the matrices in this example, each matrix object contains a vector of
+non-zero entries, a vector of the row positions of these non-zero
+entries, and a vector of column indices. In a case where a majority of
+cells in the matrix are nonzero, the size of a matrix object with this
+data storage format will be far greater than a dense matrix, which only
+needs a vector of entries (i * j in length) and a 2-d vector specifying
+its dimensions.
+
+Hints: The Matrix package uses a variant of compressed sparse row matrix
+representation, which you can read about. Inspect the matrices using
+str.
+
+\hypertarget{clustering}{%
+\section{2. Clustering}\label{clustering}}
+
+Let X be the weights matrix with columns for each agency and rows for
+each word. I normalized X such that columns have L2 norm equal to 1.
+This lets us compute a measure of similarity or correlation between
+agencies by taking the dot product of the columns representing those
+agencies. We can compute all the pairwise similarities simultaneously
+with XT X. Values range between 0 and 1; a value of 0 means the agencies
+share no words at all, and a value of 1 means the agencies give exactly
+the same weight to each word. Thus 2D = 1 − XT X acts like a distance
+matrix between the agencies, where 1 is a matrix with every entry equal
+to scalar 1.
+
+\textbf{1. Is crossprod faster than explicitly computing XT X? Why?}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cat}\NormalTok{(}\StringTok{"XT X system time:}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## XT X system time:
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{system.time}\NormalTok{(}\KeywordTok{t}\NormalTok{(sm) }\OperatorTok{%*%}\StringTok{ }\NormalTok{sm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    user  system elapsed 
+##    0.45    0.02    0.46
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cat}\NormalTok{(}\StringTok{"Crossprod system time:}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Crossprod system time:
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{system.time}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(sm, sm))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    user  system elapsed 
+##    0.51    0.00    0.54
+\end{verbatim}
+
+From crossprod()'s manual:
+
+The functions crossprod and tcrossprod are matrix products or ``cross
+products'', ideally implemented efficiently without computing t(.)'s
+unnecessarily.
+
+In this case, the time is roughly the same, likely due to the fact that
+the computation of t(.) is quick given its sparsity
+
+\textbf{2. Is crossprod faster on the sparse version of X compared to
+the dense version of X? Why?}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cat}\NormalTok{(}\StringTok{"Sparse Time: }\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Sparse Time:
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{system.time}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(sm, sm))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    user  system elapsed 
+##    0.44    0.01    0.46
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cat}\NormalTok{(}\StringTok{"Dense Matrix Time }\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Dense Matrix Time
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{system.time}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(}\KeywordTok{as}\NormalTok{(sm, }\StringTok{"dgeMatrix"}\NormalTok{), }\KeywordTok{as}\NormalTok{(sm, }\StringTok{"dgeMatrix"}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    user  system elapsed 
+##   41.13    1.28   43.76
+\end{verbatim}
+
+\textbf{3. What is the range of similarity scores that appear between
+different agencies? What two agencies are most similar? What does this
+mean in terms of the words they are using?}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{simmat =}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(sm, sm)}
+\NormalTok{simmat}\OperatorTok{@}\NormalTok{x =}\StringTok{ }\DecValTok{1} \OperatorTok{-}\StringTok{ }\NormalTok{simmat}\OperatorTok{@}\NormalTok{x}
+\KeywordTok{hist}\NormalTok{(}\KeywordTok{as.vector}\NormalTok{(simmat[}\KeywordTok{upper.tri}\NormalTok{(simmat, }\DataTypeTok{diag =} \OtherTok{FALSE}\NormalTok{)]),}
+     \DataTypeTok{main =} \StringTok{"Distribution of Distance Values"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
+\end{verbatim}
+
+\includegraphics{HW3_Final_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{simdf =}\StringTok{ }\KeywordTok{summary}\NormalTok{(simmat)}
+\NormalTok{simdf =}\StringTok{ }\NormalTok{simdf[simdf}\OperatorTok{$}\NormalTok{i }\OperatorTok{!=}\StringTok{ }\NormalTok{simdf}\OperatorTok{$}\NormalTok{j,]}
+\CommentTok{# head(simdf[order(simdf$x),])}
+
+\KeywordTok{cat}\NormalTok{(}\StringTok{"2 Most Similar Agencies"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 2 Most Similar Agencies
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{agencies}\OperatorTok{$}\NormalTok{agency_name[}\DecValTok{163}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Office of Job Corps"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{agencies}\OperatorTok{$}\NormalTok{agency_name[}\DecValTok{122}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Employment and Training Administration"
+\end{verbatim}
+
+\textbf{4. Fit an agglomerative clustering model using
+cluster::agnes(as.dist(D)). Agglomerative clustering iteratively builds
+clusters by adding points to groups. What 2 agencies are grouped
+together first? Is this what you expected based on the previous
+question?}
+
+First negative terms = first 2 First positive term = index of pair First
+2 Terms = 163, 122
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Appears that agnes needs the distance matrix to be 1 - dist to function properly}
+\NormalTok{dmat =}\StringTok{ }\KeywordTok{as.dist}\NormalTok{(simmat)}
+\NormalTok{clust =}\StringTok{ }\NormalTok{cluster}\OperatorTok{::}\KeywordTok{agnes}\NormalTok{(dmat, }\DataTypeTok{method =} \StringTok{'complete'}\NormalTok{)}
+
+\NormalTok{clust}\OperatorTok{$}\NormalTok{merge[}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{,]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       [,1] [,2]
+##  [1,] -122 -163
+##  [2,] -148 -226
+##  [3,]   -4 -212
+##  [4,]    2 -180
+##  [5,]  -30  -65
+##  [6,]  -92 -139
+##  [7,]  -91 -202
+##  [8,] -155 -164
+##  [9,]    4 -211
+## [10,]   -6 -151
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{agencies[}\DecValTok{122}\NormalTok{,]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                                agency_name agency_id      total
+## 122 Employment and Training Administration       291 8822747603
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{agencies[}\DecValTok{163}\NormalTok{,]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##             agency_name agency_id       total
+## 163 Office of Job Corps       292 16194769391
+\end{verbatim}
+
+\textbf{5. What is the first group of 3 agencies? The first group of 4
+agencies? Does agglomerative clustering appear to be doing something
+reasonable?}
+
+First 3 Terms = 148, 226, 180 First 4 Terms = 148, 226, 180, 211
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{agencies[}\KeywordTok{c}\NormalTok{(}\DecValTok{138}\NormalTok{, }\DecValTok{226}\NormalTok{, }\DecValTok{180}\NormalTok{, }\DecValTok{211}\NormalTok{),]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                                agency_name agency_id      total
+## 138           Foreign Agricultural Service       154 1985800923
+## 226            Office of Inspector General       459  118954118
+## 180            Office of Inspector General       270  144048587
+## 211 Assistant Secretary for Administration       886   65014325
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{factoextra}\OperatorTok{::}\KeywordTok{fviz_dend}\NormalTok{(clust)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HW3_Final_files/figure-latex/unnamed-chunk-9-1.pdf}
+
+\textbf{6. Fit a partitioning around medoids clustering model using
+cluster::pam with k = 2 clusters. To what extent do the cluster
+assignments agree with the agglomerative clustering model?}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{hlabels <-}\StringTok{ }\KeywordTok{cutree}\NormalTok{(clust, }\DecValTok{2}\NormalTok{)}
+\NormalTok{pamclust <-}\StringTok{ }\NormalTok{cluster}\OperatorTok{::}\KeywordTok{pam}\NormalTok{(}\DataTypeTok{k =} \DecValTok{2}\NormalTok{, dmat)}
+\NormalTok{pamlabels <-}\StringTok{ }\NormalTok{pamclust}\OperatorTok{$}\NormalTok{clustering}
+
+\NormalTok{dat =}\StringTok{ }\KeywordTok{cbind}\NormalTok{(agencies, pamlabels, hlabels)}
+
+\NormalTok{dat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{factor}\NormalTok{(pamlabels),}
+                   \DataTypeTok{fill =} \KeywordTok{factor}\NormalTok{(hlabels))) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_bar}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{"PAM Cluster Label"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Count"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{guides}\NormalTok{(}\DataTypeTok{fill=}\KeywordTok{guide_legend}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Agnes Label"}\NormalTok{)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"Cluter Method Comparison"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HW3_Final_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{viz <-}\StringTok{ }\NormalTok{MASS}\OperatorTok{::}\KeywordTok{isoMDS}\NormalTok{(dmat, }\DataTypeTok{k=}\DecValTok{2}\NormalTok{) }\CommentTok{# k is the number of dim}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## initial  value 43.497777 
+## iter   5 value 33.605293
+## iter  10 value 30.562769
+## iter  15 value 29.739395
+## iter  20 value 29.495166
+## final  value 29.430899 
+## converged
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(viz}\OperatorTok{$}\NormalTok{points[,}\DecValTok{1}\NormalTok{], }
+\NormalTok{     viz}\OperatorTok{$}\NormalTok{points[,}\DecValTok{2}\NormalTok{], }
+     \DataTypeTok{xlab=}\StringTok{"Coordinate 1"}\NormalTok{, }\DataTypeTok{ylab=}\StringTok{"Coordinate 2"}\NormalTok{, }
+     \DataTypeTok{main=}\StringTok{"NonMetric MDS"}\NormalTok{,}
+     \DataTypeTok{col =}\NormalTok{ pamlabels)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{HW3_Final_files/figure-latex/unnamed-chunk-10-2.pdf}
+
+\textbf{7. Think about all the steps we've taken in preparing the data
+and coming this far. Would you say that clustering is a subjective
+task?}
+
+Yes
+
+
+\end{document}

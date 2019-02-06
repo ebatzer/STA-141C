@@ -1,0 +1,204 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r}
+knitr::opts_chunk$set(warning = FALSE, echo = TRUE, message = FALSE, eval = FALSE)
+```
+
+```{r}
+library(Matrix); library(MASS); library(factoextra)
+library(tidyverse); library(cluster); library(microbenchmark)
+
+zip_file_path = "./data/award_words.zip"
+unzip(zip_file_path)
+
+words = read.csv("words.csv", stringsAsFactors = FALSE)
+weights = read.csv("weights.csv", stringsAsFactors = FALSE)
+agencies = read.csv("agencies.csv", stringsAsFactors = FALSE)
+```
+
+__1. What are the advantages and disadvantages of using lookup tables to represent the agencies and words, compared to storing everything in one table?__
+
+__2. Compute the sizes of the following objects algebraically, and verify the sizes in R. Recall from lecture that there may be around 1 KB memory overhead per object, so your theoretical results will not match exactly.__
+
+Size of triple representation
+
+$$ n * s_i + n * s_i + n * s_d $$
+$$ 145834 * (4 + 4 + 8) = 23336544$$ 
+
+Size of sparse matrix
+$$ n * s_d + n * s_i + d * s_i $$
+$$ 145834 * 8 + 145834 * 4 + 243 * 4 = 17504880$$
+
+Size of sparse matrix transpose
+$$ n * s_d + w * s_i + n * s_i$$
+$$ 145834 * 8 + 340216 * 4 + 145834 * 4 = 18863272$$
+
+Size of dense matrix
+$$ w * d * s_n$$
+$$ (340216 * 243) * 8 = 661379904$$
+
+```{r}
+n = nrow(weights)
+w = length(unique(weights$word_index))
+d = length(unique(weights$agency_index))
+si = 4
+sd = 8
+
+# Triple rep
+cat(paste("Triple Rep Est:", n * (si + si + sd), "bytes \n"))
+cat(paste("Triple Rep Obs: "), object.size(weights))
+
+# Sparse
+sm = sparseMatrix(j = weights$agency_index, i = weights$word_index, x = weights$weight)
+cat(paste("Sparse Est:",  n * sd + n * si + d * si, "bytes \n"))
+cat(paste("Sparse Obs: "), object.size(sm))
+
+# Sparse transpose
+cat(paste("Sparse Transpose Est:", n * sd + w * si + n * si, "bytes \n"))
+cat(paste("Sparse Transpose Obs: "), object.size(t(sm)))
+
+# Dense
+cat(paste("Dense Est:", (w * d) * sd, "bytes \n"))
+cat(paste("Dense Obs: "), object.size(as(sm, "dgeMatrix")))
+
+```
+
+__3. Comment on the sizes of the objects you calculated and verified above. Here are some questions to get you thinking:__
+
+* How do the sizes compare to the sparse representation on disk in ASCII text, the weights.csv file?
+
+```{r}
+cat(paste("File Size on Disk:", file.info("weights.csv")$size, "bytes"))
+```
+
+* What is the sparsity of the matrix? (Sparsity is the number of zero-valued elements divided by the total number of elements)
+
+```{r}
+cat(paste("Sparsity:", round(((w * d) - n) / (w * d), 3)))
+```
+
+* What’s the most efficient memory representation for this particular data?
+
+* Under what conditions would a different representation work better? Could dense
+ever be better than sparse?
+
+Hints: The Matrix package uses a variant of compressed sparse row matrix representation,
+which you can read about. Inspect the matrices using str.
+
+# 2. Clustering
+Let X be the weights matrix with columns for each agency and rows for each word. I
+normalized X such that columns have L2 norm equal to 1. This lets us compute a measure
+of similarity or correlation between agencies by taking the dot product of the columns
+representing those agencies. We can compute all the pairwise similarities simultaneously with
+XT X. Values range between 0 and 1; a value of 0 means the agencies share no words at
+all, and a value of 1 means the agencies give exactly the same weight to each word. Thus
+2D = 1 − XT X acts like a distance matrix between the agencies, where 1 is a matrix with
+every entry equal to scalar 1.
+
+__1. Is crossprod faster than explicitly computing XT X? Why?__
+
+```{r}
+cat("XT X system time:\n")
+bench = microbenchmark::microbenchmark(t(sm) %*% sm, times = 10L, unit = "s")
+bench
+
+cat("Crossprod system time:\n")
+bench = microbenchmark::microbenchmark(crossprod(sm, sm), times = 10L, unit = "s")
+bench
+```
+
+__2. Is crossprod faster on the sparse version of X compared to the dense version of X? Why?__
+
+```{r}
+cat("Sparse Time: \n")
+bench = microbenchmark::microbenchmark(crossprod(sm, sm), times = 10L, unit = "s")
+bench
+
+cat("Dense Matrix Time \n")
+bench = microbenchmark::microbenchmark(crossprod(as(sm, "dgeMatrix"), as(sm, "dgeMatrix")), times = 10L, unit = "s")
+bench
+```
+
+__3. What is the range of similarity scores that appear between different agencies? What two agencies are most similar? What does this mean in terms of the words they are using?__
+
+```{r}
+simmat = crossprod(sm, sm)
+simmat@x = 1 - simmat@x
+hist(as.vector(simmat[upper.tri(simmat, diag = FALSE)]),
+     main = "Distribution of Distance Values")
+
+simdf = summary(simmat)
+simdf = simdf[simdf$i != simdf$j,]
+
+cat("2 Most Similar Agencies")
+agencies$agency_name[163]
+agencies$agency_name[122]
+```
+
+__4. Fit an agglomerative clustering model using cluster::agnes(as.dist(D)). Agglomerative clustering iteratively builds clusters by adding points to groups. What 2 agencies are grouped together first? Is this what you expected based on the previous question?__
+
+First negative terms = first 2
+First positive term = index of pair
+First 2 Terms = 163, 122
+
+```{r}
+# Appears that agnes needs the distance matrix to be 1 - dist to function properly
+dmat = as.dist(simmat)
+clust = cluster::agnes(dmat, method = 'complete')
+
+# Display ordering of clustering 
+clust$merge[1:10,]
+agencies[122,]
+agencies[163,]
+```
+
+
+__5. What is the first group of 3 agencies? The first group of 4 agencies? Does agglomerative clustering appear to be doing something reasonable?__
+
+First 3 Terms =  148, 226, 180
+First 4 Terms = 148, 226, 180, 211
+
+```{r}
+agencies[c(138, 226, 180, 211),]
+
+# Plotting dendrogram for any inconsistencies (doing something reasonable?)
+factoextra::fviz_dend(clust)
+```
+
+__6. Fit a partitioning around medoids clustering model using cluster::pam with k = 2 clusters. To what extent do the cluster assignments agree with the agglomerative clustering model?__
+
+```{r}
+# Comparing pam(k=2) and cutree(k = 2)
+hlabels <- cutree(clust, 2)
+pamclust <- cluster::pam(k = 2, dmat)
+pamlabels <- pamclust$clustering
+dat = cbind(agencies, pamlabels, hlabels)
+
+# Plotting visualization of labels
+dat %>% ggplot(aes(x = factor(pamlabels),
+                   fill = factor(hlabels))) + 
+  geom_bar() +
+  xlab("PAM Cluster Label") +
+  ylab("Count") +
+  guides(fill=guide_legend(title="Agnes Label")) +
+  ggtitle("Cluter Method Comparison")
+
+# Nonmetric MDS as another visualization tool (compressing to 2 dimensions)
+# Messy pattern -- seems to confirm the difficulty in representing this data 
+# in two dimesions, as there's very little overlap among agencies
+viz <- MASS::isoMDS(dmat, k=2)
+plot(viz$points[,1], 
+     viz$points[,2], 
+     xlab="Coordinate 1", ylab="Coordinate 2", 
+     main="NonMetric MDS",
+     col = pamlabels)
+```
+
+__7. Think about all the steps we’ve taken in preparing the data and coming this far. Would you say that clustering is a subjective task?__
+

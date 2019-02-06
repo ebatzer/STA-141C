@@ -1,0 +1,200 @@
+---
+title: "STA 141C HW3"
+output: html_notebook
+---
+
+1. Object sizes
+
+All of the following questions refer to the weights table.
+Show your work, i.e. the formulas and expressions you are using. Use the following notation: 
+
+* d number of distinct documents / agencies in this data set 
+* w number of distinct words 
+* n number of observations in weights.csv 
+* si size of an integer (4 bytes in R) 
+* sd size of a double precision floating point number (8 bytes in R). 
+
+```{r}
+library(Matrix); library(MASS); library(factoextra)
+zip_file_path = "./data/award_words.zip"
+unzip(zip_file_path)
+
+words = read.csv("words.csv", stringsAsFactors = FALSE)
+weights = read.csv("weights.csv", stringsAsFactors = FALSE)
+agencies = read.csv("agencies.csv", stringsAsFactors = FALSE)
+```
+
+__1. What are the advantages and disadvantages of using lookup tables to represent the agencies and words, compared to storing everything in one table?__
+
+__2. Compute the sizes of the following objects algebraically, and verify the sizes in R. Recall from lecture that there may be around 1 KB memory overhead per object, so your theoretical results will not match exactly.__
+
+• the triple representation in memory (the data frame weights = read.csv("weights.csv"))
+• the sparse matrix X with columns for each agency and rows for each word (Use
+Matrix::sparseMatrix)
+• the transpose of X, with columns for each word and rows for each agency
+• the dense matrix version of X
+
+__Weight of triple representation__
+
+$$ n * s_i + n * s_i + n * s_d $$
+$$ 145834 * (4 + 4 + 8) = 23336544$$ 
+
+__Weight of sparse matrix__
+$$ n * s_d + n * s_i + d * s_i $$
+$$ 145834 * 8 + 145834 * 4 + 243 * 4 = 17504880$$
+__Weight of sparse matrix transpose__
+$$ n * s_d + w * s_i + n * s_i$$
+$$ 145834 * 8 + 340216 * 4 + 145834 * 4 = 18863272$$
+__Weight of dense matrix__
+$$ w * d * s_n$$
+$$ (340216 * 243) * 8 = 661379904$$
+
+```{r}
+n = nrow(weights)
+w = length(unique(weights$word_index))
+d = length(unique(weights$agency_index))
+si = 4
+sd = 8
+
+# Triple rep
+cat("Est:"); n * (si + si + sd)
+cat("Obs:"); object.size(weights)
+
+# Sparse
+sm = sparseMatrix(j = weights$agency_index, i = weights$word_index, x = weights$weight)
+cat("Est:"); n * sd + n * si + d * si
+cat("Obs:"); object.size(sm)
+
+# Sparse transpose
+cat("Est:"); n * sd + w * si + n * si
+cat("Obs:"); object.size(t(sm))
+
+# Dense
+cat("Est:"); (w * d) * sd
+cat("Obs:"); object.size(as(sm, "dgeMatrix"))
+
+```
+
+3. Comment on the sizes of the objects you calculated and verified above. Here are some
+questions to get you thinking:
+
+• How do the sizes compare to the sparse representation on disk in ASCII text, the
+weights.csv file?
+
+```{r}
+file.info("weights.csv")$size
+```
+
+
+• What is the sparsity of the matrix? (Sparsity is the number of zero-valued elements
+divided by the total number of elements)
+
+```{r}
+((w * d) - n) / (w * d)
+```
+
+• What’s the most efficient memory representation for this particular data?
+
+The sparse matrix is the most efficient memory representation for this particular dataset.
+
+• Under what conditions would a different representation work better? Could dense
+ever be better than sparse?
+
+Dense could be better than sparse as the number of non-zero cells in the matrix
+approaches zero. In the row-organized sparse representation of the matrices in this
+example, each matrix object contains a vector of non-zero entries, a vector of the
+row positions of these non-zero entries, and a vector of column indices. In a
+case where a majority of cells in the matrix are nonzero, the size of a matrix object
+with this data storage format will be far greater than a dense matrix, which only
+needs a vector of entries (i * j in length) and a 2-d vector specifying its dimensions.
+
+Hints: The Matrix package uses a variant of compressed sparse row matrix representation,
+which you can read about. Inspect the matrices using str.
+
+# 2. Clustering
+Let X be the weights matrix with columns for each agency and rows for each word. I
+normalized X such that columns have L2 norm equal to 1. This lets us compute a measure
+of similarity or correlation between agencies by taking the dot product of the columns
+representing those agencies. We can compute all the pairwise similarities simultaneously with
+XT X. Values range between 0 and 1; a value of 0 means the agencies share no words at
+all, and a value of 1 means the agencies give exactly the same weight to each word. Thus
+2D = 1 − XT X acts like a distance matrix between the agencies, where 1 is a matrix with
+every entry equal to scalar 1.
+
+__1. Is crossprod faster than explicitly computing XT X? Why?__
+
+```{r}
+system.time(t(sm) %*% sm)
+system.time(crossprod(sm, sm))
+```
+
+The functions crossprod and tcrossprod are matrix products or “cross products”, ideally implemented efficiently without computing t(.)'s unnecessarily.
+
+__2. Is crossprod faster on the sparse version of X compared to the dense version of X? Why?__
+
+```{r}
+system.time(crossprod(sm, sm))
+system.time(crossprod(as(sm, "dgeMatrix"), as(sm, "dgeMatrix")))
+```
+
+__3. What is the range of similarity scores that appear between different agencies? What two agencies are most similar? What does this mean in terms of the words they are using?__
+
+```{r}
+simmat = crossprod(sm, sm)
+simmat@x = 1 - simmat@x
+hist(as.vector(simmat[upper.tri(simmat, diag = FALSE)]))
+
+simdf = summary(simmat)[simdf$i != simdf$j,]
+head(simdf[order(simdf$x),])
+
+agencies$agency_name[163]
+agencies$agency_name[122]
+```
+
+__4. Fit an agglomerative clustering model using cluster::agnes(as.dist(D)). Agglomerative clustering iteratively builds clusters by adding points to groups. What 2 agencies are grouped together first? Is this what you expected based on the previous question?__
+
+First negative terms = first 2
+First positive term = index of pair
+First 2 Terms = 163, 122
+
+```{r}
+# Appears that agnes needs the distance matrix to be 1 - dist to function properly
+dmat = as.dist(1 - simmat)
+clust = cluster::agnes(dmat)
+
+head(clust$merge)
+
+agencies[163,]
+agencies[122,]
+```
+
+
+__5. What is the first group of 3 agencies? The first group of 4 agencies? Does agglomerative clustering appear to be doing something reasonable?__
+
+First 3 Terms = 122, 163, 180
+First 4 Terms = 122, 163, 180, 218
+
+```{r}
+agencies[180,]
+agencies[218,]
+factoextra::fviz_dend(clust)
+tail(clust$merge)
+```
+
+__6. Fit a partitioning around medoids clustering model using cluster::pam with k = 2 clusters. To what extent do the cluster assignments agree with the agglomerative clustering model?__
+
+```{r}
+hlabels <- cutree(clust, 2)
+pamclust <- cluster::pam(k = 2, dmat)
+mlabels <- pamclust$clustering
+
+viz <- MASS::isoMDS(dmat, k=2) # k is the number of dim
+plot(viz$points[,1], 
+     viz$points[,2], 
+     xlab="Coordinate 1", ylab="Coordinate 2", 
+     main="NonMetric MDS",
+     col = mlabels)
+```
+
+__7. Think about all the steps we’ve taken in preparing the data and coming this far. Would you say that clustering is a subjective task?__
+

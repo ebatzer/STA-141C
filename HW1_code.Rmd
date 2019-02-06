@@ -1,0 +1,148 @@
+---
+title: "HW1"
+output: html_notebook
+author: Evan Batzer
+date: 1/14/2019
+---
+__1 - Computation__
+
+Compute the median annual spending for each agency.
+
+unzip, unz, list.files, lapply, tapply, median, log, hist, file.info,
+system.time
+
+```{r}
+library(tidyverse); library(data.table)
+zip_file_path = "./data/awards.zip"
+files = unzip(zip_file_path, list = TRUE)
+
+fnames = files$Name
+
+fnames = fnames[-1]
+
+sumSpending = function(fnames){
+  
+  output <- list()
+  processsummary <- list()
+  counter = 1
+  
+  for(fname in fnames){
+    
+    #d = fread(paste('unzip -cq ', zip_file_path, fname), 
+    #          blank.lines.skip = TRUE)
+    f = unz(zip_file_path, fname)
+    d = read.csv(f)
+     
+    d$date = as.Date(d$period_of_performance_start_date)
+    d$year = year(d$date)
+    
+    testthat::expect_true(length(unique(d$funding_agency_name)) == 1)
+    total =  tapply(d$total_obligation, INDEX = d$year, FUN = sum)
+    
+    output[[counter]] = data.frame(agency = unique(d$funding_agency_name),
+                                   total,
+                                   year = names(total))
+    
+    processsummary[[counter]] = data.frame(agency = unique(d$funding_agency_name),
+                                           filename = fname,
+                                           nrows = nrow(d))
+    
+    counter = counter + 1
+  }
+  
+  return(list(medians = do.call(rbind, output),
+              process = do.call(rbind, processsummary)))
+}
+
+output = sumSpending(fnames)
+
+View(output[[2]])
+```
+
+1. Which agencies have the highest median annual spending?
+
+```{r, warning=FALSE}
+median_df = output[[1]] %>%
+  group_by(agency) %>%
+  summarise(mspend = median(total))
+
+head(median_df %>% arrange(desc(mspend)))
+```
+
+```{r, warning=FALSE}
+output = sumSpending(fnames)
+
+median_df = output[[1]] %>%
+  group_by(agency) %>%
+  summarise(mspend = median(total))
+
+head(median_df %>% arrange(desc(mspend)))
+```
+
+
+2. Qualitatively describe the distribution of median annual spending.
+
+```{r}
+med_plot = median_df %>% 
+  ggplot(aes(x = mspend)) +
+  geom_histogram(fill = "lightblue", color = "black") +
+  ggtitle("Median Spending Distribution")
+
+med_plot
+```
+
+3. Qualitatively describe the distribution of the logarithm of the median annual spending.
+Plot the histogram.
+
+```{r}
+logmed_plot = median_df %>% 
+  ggplot(aes(x = log(mspend))) +
+  geom_histogram(fill = "lightblue", color = "black") +
+  ggtitle("Log Median Spending Distribution")
+
+logmed_plot
+```
+
+Plotting both together for writeup
+
+```{r}
+gridExtra::grid.arrange(med_plot, logmed_plot, nrow = 1)
+```
+
+4. Is there a clear separation between agencies that spend a large amount of money, and
+those which spend less money?
+
+
+1. Qualitatively describe the distribution of the file sizes.
+
+```{r}
+spendfiles = unzip(zip_file_path, list = TRUE)
+spendfiles %>% ggplot(aes(x = Length)) +
+  geom_histogram(fill = "lightblue", color = "black") +
+  ggtitle("Distribution of File Length")  
+  
+```
+
+2. How does the size of the file relate to the number of rows in that file?
+
+```{r}
+inner_join(spendfiles, output[[2]], by = c("Name" = "filename")) %>%
+  ggplot(aes(x = Length,
+             y = nrows)) +
+  geom_point(size = 4, fill = "lightblue", color = "black", pch = 21) +
+  stat_smooth(se = FALSE, method = "lm")
+```
+
+3. How long does it take to process all the data?
+
+```{r}
+system.time(sumSpending(fnames))
+```
+
+4. Do you think this same approach you took work for 10 times as many files? What if
+each file was 10 times larger?
+
+5. How do you imagine you could make it faster?
+
+
+

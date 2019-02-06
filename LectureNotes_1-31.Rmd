@@ -1,0 +1,49 @@
+---
+title: "Lecture Notes 1/31"
+output: html_notebook
+---
+
+# Subjects
+
+__Bash__
+* Read the help pages
+* How the shell finds programs
+* Write out own little programs
+
+We like it because
+* It's stable, there's a POSIX standard
+* It's powerful
+* It's easy to automate tasks
+
+__Other Shells__
+* fish
+* Git bash
+* Zshell
+* Tshell
+* Cshell
+* Powershell
+* Cygwin
+
+* Or better yet, just connect to a server
+
+# REPL - Read-Eval-Print Loop
+
+# Special symbols inside bash
+
+* Home directory - ~
+* Current directory - .
+* Parent directory - ..
+* Navigating directory - cd
+* How to find all keyboard shortcuts for the file page? (less)
+
+# To run R commands in the shell, use:
+* Rscript hello.R
+
+# How about as an executable?
+* ./hello.R doesn't work
+* Add chmod +x hello.R makes it an exectuable
+
+# Some caution
+* Removing files is _for real_
+* However, if you remove git, it's not such a big deal
+

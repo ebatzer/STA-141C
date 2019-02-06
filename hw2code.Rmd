@@ -1,0 +1,154 @@
+---
+title: "Homework 2"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r}
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, results = "hide")
+```
+
+# Questions
+
+## 1. Write a function to compute the top n = 25 most heavily weighted words for each agency. Describe your approach to text preprocessing. What steps did you take in what order? Why?
+
+__Text processing function__
+
+Steps:
+
+* Convert ASCII/unicode
+* To lowercase
+* Remove punctutation
+* Stem words
+* Remove stopwords
+
+```{r}
+library(tm); library(tidytext)
+
+textprocess = function(fname, 
+                       zipfile = zip_file_path,
+                       n = 25){
+  
+    rawcsv = unz(zipfile, fname)
+    zipfile = zip_file_path
+    d = read.csv(rawcsv, stringsAsFactors = FALSE)
+    strings = d$description
+
+    # Encode strings in UTF8 if not valid
+    strings = ifelse(validUTF8(strings), strings, enc2utf8(strings))
+    
+    # Set to lowercase
+    strings = tolower(strings)
+    
+    # Remove punctuation
+    strings = removePunctuation(strings)
+    
+    # Stem strings
+    strings = stemDocument(strings)
+    
+    # Remove stopwords
+    strings = removeWords(strings, stopwords("en"))
+    
+    # Convert to tidy document term matrix
+    dt = DocumentTermMatrix(VCorpus(VectorSource(strings)))
+    tidydf = tidy(dt)
+    
+    # Sum counts of words in each document and attach obligation
+    costdf = merge(aggregate(tidydf$count, by = list(document = tidydf$document), FUN = sum),
+          data.frame(document = c(1:nrow(d)), d$total_obligation))
+    
+    colnames(costdf) = c("document", "wordcount", "total_obligation")
+    
+    # Calculate wordweight and merge with term dataframe
+    costdf$wordweight = costdf$total_obligation / costdf$wordcount
+    tidydf = merge(tidydf, costdf, by = "document")
+    
+    # Sum list of most weighted terms
+    outputdf = aggregate(tidydf$wordweight * tidydf$wordcount, by = list(term = tidydf$term), FUN = sum)
+    colnames(outputdf) = c("word", "weight")
+    
+    # Order by weight and return the n most common terms
+    outputdf = outputdf[order(outputdf$weight, decreasing = TRUE),]
+    return(outputdf[1:n,])
+}
+```
+
+
+## 2. Use this function to process the 91 agencies that have file sizes between 1 MB and 50 MB. (Recall 1 MB = 2ˆ20 = 1048576 bytes) Examine your result and use it to improve the function you wrote above. What did you have to change as you looked at the result?
+
+```{r}
+zip_file_path = "./data/awards.zip"
+files = unzip(zip_file_path, list = TRUE)
+fnames = files$Name
+
+# Remove the "0.csv" file
+fnames = files$Name[files$Length > 1048576 & 
+                  files$Length < (50 * 1048576)]
+
+zip_file_path = "./data/awards.zip"
+
+# Tablulate spending and term frequencies for each file
+o = lapply(fnames, textprocess)
+names(o) = fnames
+
+# Saving for future access to output without needing to re-run code
+# save(o, file="termfreqoutput.RData")
+```
+
+## 3. Show your results in a table for the following agencies:
+• National Science Foundation (655)
+• Federal Bureau of Investigation (262)
+• U.S. Customs and Border Protection (778)
+• Forest Service (110)
+
+__NSF__
+```{r}
+o$"655.csv"
+```
+__FBI__
+```{r}
+o$"262.csv"
+```
+__Customs and border protection__
+```{r}
+o$"778.csv"
+```
+__Forest service__
+```{r}
+o$"110.csv"
+```
+
+## 4. For the agencies listed above, are the results consistent with the name of the agency?
+
+For example, do the words associated with the National Science Foundation seem related to science? Did you notice any strange results in these or in any other agencies?
+
+## 5. Make your program parallel on your local machine with parallel::clusterLapply and with parallel::clusterLapplyLB. Use 2 or more processes on your local machine and time both results. What do these functions do? Are they faster than the serial version of lapply? Which is fastest?
+
+```{r}
+library(parallel)
+
+# Creating cluster
+cls = makeCluster(4L, type = "PSOCK")
+
+# Checking cluster environment
+clusterCall(cls, ls, envir = globalenv())
+
+# Sending necessary info to cluster
+clusterExport(cls, "termweights")
+clusterExport(cls, "textprocess")
+clusterExport(cls, "zip_file_path")
+clusterEvalQ(cls, library("tm"))
+clusterEvalQ(cls, library("tidytext"))
+
+# Timing functions
+system.time(parallel::parLapply(cl = cls, X = fnames, fun = textprocess))
+system.time(parallel::clusterApplyLB(cl = cls, x = fnames, fun = textprocess))
+system.time(lapply(fnames, textprocess))
+```
+
+
+
+
+

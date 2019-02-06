@@ -1,0 +1,23 @@
+---
+title: "Class 1"
+output: html_notebook
+---
+
+```{r}
+zip_file_path = "./data/awards.zip"
+
+files = unzip(zip_file_path, list = TRUE)
+head(files)
+
+# Let's pick one file out of the archive
+fname = "1074.csv"
+
+unzip(zip_file_path, files = fname)
+
+# Read it into R
+d = read.csv(file = "1074.csv")
+
+# Always be touching your data
+
+```
+
