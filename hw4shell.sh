@@ -1,10 +1,10 @@
 #!/bin/bash -l
 
 # Use the staclass partition. Only applies if you are in STA141C
-#SBATCH --partition = "staclass"
+#sbatch --partition = staclass
 
 # Give the job a name
-#SBATCH --job-name = "bashtest"
+#sbatch --job-name = "bashtest"
 
 # Setting DATAFILE
 unzip -p ../../group/staclassgrp/transaction.zip | cat > transaction_large
