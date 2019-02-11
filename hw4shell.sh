@@ -1,0 +1,12 @@
+# Setting DATAFILE
+DATAFILE ="/group/staclassgrp/transaction.zip"
+unzip =p ${DATAFILE} | cat > transaction_large
+
+# For length of largest line
+wc -L transaction_large > maxchars.txt
+
+# For number of lines where bicycle appears
+grep -n -i bicycle transaction_large > bicycle.csv
+
+# Finding the list of unique funding agency ID's
+cut -f 18 -d , transaction_large | sort | uniq > funding_agency_set.txt

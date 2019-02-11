@@ -47,3 +47,10 @@ __Other Shells__
 * Removing files is _for real_
 * However, if you remove git, it's not such a big deal
 
+# Shell Commands
+* sdin > file name (redirect)
+* stdin  >> file name (append)
+* stdin | command (pipe)
+    * Can string together commands by ending lines with |
+    
+
