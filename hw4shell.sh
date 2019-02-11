@@ -4,7 +4,7 @@
 #SBATCH --partition staclass
 
 # Give the job a name
-#SBATCH --job-name submission
+#SBATCH --job-name sub
 
 # Setting DATAFILE
 unzip -p ../../group/staclassgrp/transaction.zip | cat > transaction_large
