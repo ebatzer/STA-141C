@@ -7,7 +7,7 @@ SBATCH --partition = staclass
 SBATCH --job-name = bashtest
 
 # Setting DATAFILE
-DATAFILE ="../../group/staclassgrp/transaction.zip"
+DATAFILE = ../../group/staclassgrp/transaction.zip
 unzip -p ${DATAFILE} | cat > transaction_large
 
 # For length of largest line
