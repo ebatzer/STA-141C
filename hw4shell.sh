@@ -6,7 +6,7 @@
 # Give the job a name
 #SBATCH --job-name hwsub
 
-# Unzipping transaction file (commented out after running 1st time)
+# Unzipping transaction file
 unzip -p ../../scratch/transaction.zip > transaction_large
 
 # For indices of column names
