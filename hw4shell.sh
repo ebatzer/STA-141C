@@ -6,8 +6,8 @@
 # Give the job a name
 #SBATCH --job-name hwsub
 
-# Setting DATAFILE
-unzip -p ../../group/staclassgrp/transaction.zip > transaction_large
+# Unzipping transaction file (commented out after running 1st time)
+# unzip -p ../../group/staclassgrp/transaction.zip > transaction_large
 
 # For indices of column names
 head -n 1 transaction_large | tr -s "," "\n" | nl > column_index.txt
