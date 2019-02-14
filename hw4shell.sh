@@ -1,4 +1,4 @@
-DATAFILE="scratch/transaction.zip"
+DATAFILE="/scratch/transaction.zip"
 AMT=8 # Funding amount
 FUNDID=18 # Funding agency ID
 DESC=25 # Payment description
