@@ -6,4 +6,4 @@
 # Give the job a name
 #SBATCH --job-name hwsub
 
-bash hw4shell.sh
+bash ./STA-141C/hw4shell.sh
