@@ -1,18 +1,11 @@
-#!/bin/bash -l
-
-# Use the staclass partition. Only applies if you are in STA141C
-#SBATCH --partition staclass
-
-# Give the job a name
-#SBATCH --job-name hwsub
 
 # Global Variables
-#DATAFILE = "../../scratch/transaction.zip"
-#AMT = 8 # Funding amount
-#FUNDID = 18 # Funding agency ID
-#DESC = 25 # Payment description
-#STATEID = 36 # Recipient state ID
-#FUNDDESC = 54 # Funding agency description (text)
+DATAFILE = "scratch/transaction.zip"
+AMT = 8 # Funding amount
+FUNDID = 18 # Funding agency ID
+DESC = 25 # Payment description
+STATEID = 36 # Recipient state ID
+FUNDDESC = 54 # Funding agency description (text)
 
 # For indices of column names
 unzip -p ${DATAFILE} |
