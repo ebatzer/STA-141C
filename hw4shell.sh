@@ -30,8 +30,8 @@ unzip -p ${DATAFILE} |
 # Find the description and amount
 unzip -p ${DATAFILE} |
 	cut --fields ${AMT},${DESC} -d , |
-	sort -k1 --reverse --numeric-sort |
-	head -n 3 > largest.csv
+	sort -k1,1 --reverse --numeric-sort | # k1,1 defines we're only sorting on the first column
+	head -n 30 > largest.csv
 
 # Finding where border funding goes
 # First, cut down dataset to relevant columns
@@ -40,7 +40,7 @@ unzip -p ${DATAFILE} |
 	cut --fields ${AMT},${DESC},${STATEID} --delimiter , |
 
 # Then, search for the term "border" in the funding description (case insensitive)
-	grep -i border |
+	grep --ignore-case border |
 
 	# Then, using awk, delimit fields by "," and sum over unique values of the array
 	# Unique values of the third column have summed values in the first column
