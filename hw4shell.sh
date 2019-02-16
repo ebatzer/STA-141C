@@ -30,7 +30,7 @@ unzip -p ${DATAFILE} |
 # Find the description and amount
 unzip -p ${DATAFILE} |
 	cut --fields ${AMT},${DESC} -d , |
-	sort -k1,1 --reverse --numeric-sort | # k1,1 defines we're only sorting on the first column
+	sort -k1,1 --reverse --numeric-sort --field-separator=","| # k1,1 defines we're only sorting on the first column
 	head -n 30 > largest.csv
 
 # Finding where border funding goes
