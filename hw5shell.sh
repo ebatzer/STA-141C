@@ -7,5 +7,5 @@ PARREC=52 # Parent recipient ID
 head ${DATAFILE} |
 	cut --fields ${ACDATE},${TOTOBL},${PARREC} --delimiter , |
 	uniq |
-	python3 ./STA-141c/hw5process.py |
+	python3 ./STA-141C/hw5process.py |
 	cat > test.txt
