@@ -51,6 +51,27 @@ __Other Shells__
 * sdin > file name (redirect)
 * stdin  >> file name (append)
 * stdin | command (pipe)
-    * Can string together commands by ending lines with |
+    * Can string together commands by ending lines with "|"
     
+# On Python
+Iterables - Can be looped over
 
+Include objects
+
+In memory:
+  * Lists
+  * Tuples
+  * Dicts
+  * Set
+  * Strings
+  * NumPy arrays
+  
+Lazily computed:
+  * Generators
+    * Distinguished by the yield statement, instead of return
+    * Can be exhausted and won't return any more elements
+  * Files
+      * stdin
+      * csv file
+  * range, zip, enumerate
+  * itertools
