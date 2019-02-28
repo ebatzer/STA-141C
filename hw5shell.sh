@@ -11,4 +11,4 @@ module load python3
 #	python3 ./STA-141C/hw5count.py |
 #	cat > digits.txt
 
-R ./STA-141C/hw5process.R
+Rscript ./STA-141C/hw5process.R
