@@ -1,4 +1,4 @@
-DATAFILE="/scratch/transaction.csv"
+DATAFILE="./scratch/transaction.csv"
 ACDATE=3 # Action date
 TOTOBL=8 # Total obligation
 PARREC=52 # Parent recipient ID
