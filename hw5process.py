@@ -1,6 +1,6 @@
 # Stream in file from bash
 import csv
-import pandas
+import pandas as pd
 
 def benford(x):
     log10(1 + 1/x)
