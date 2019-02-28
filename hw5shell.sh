@@ -6,9 +6,9 @@ PARREC=52 # Parent recipient ID
 load module python3
 
 # For indices of column names
-cut --fields ${ACDATE},${TOTOBL},${PARREC} --delimiter , ${DATAFILE}|
-	uniq |
-	python3 ./STA-141C/hw5count.py |
-	cat > digits.txt
+# cut --fields ${ACDATE},${TOTOBL},${PARREC} --delimiter , ${DATAFILE}|
+#	uniq |
+#	python3 ./STA-141C/hw5count.py |
+#	cat > digits.txt
 
-python3 hw5process.py
+python3 ./STA-141C/hw5process.py
