@@ -16,10 +16,5 @@ def main():
             pass
         writer.writerow(row)
 
-
 if __name__ == "__main__":
     main()
-
-# df['first_digit'] = df['TOTAL OBLIGATION'].astype(str).str[0]
-
-# df.groupby(["PARENT RECIPIENT ID", "first_digit"]).count()
