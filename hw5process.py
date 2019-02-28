@@ -11,7 +11,7 @@ def main():
 
     for row in reader:
         try:
-            row[-1] = row[-1][0]
+            row[1] = row[1][0]
         except IndexError:
             pass
         writer.writerow(row)
