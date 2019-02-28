@@ -3,6 +3,8 @@ ACDATE=3 # Action date
 TOTOBL=8 # Total obligation
 PARREC=52 # Parent recipient ID
 
+module load python3
+
 # For indices of column names
 ${DATAFILE} |
 	cut --fields ${ACDATE},${TOTOBL},${PARREC} --delimiter , |

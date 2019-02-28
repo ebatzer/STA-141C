@@ -6,6 +6,4 @@
 # Give the job a name
 #SBATCH --job-name hwsub
 
-module load python3
-
 bash ./STA-141C/hw5shell.sh
