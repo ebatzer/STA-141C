@@ -11,5 +11,5 @@ obligation = 1
 # Tabulating
 df = pd.read_csv('digits.txt', sep=",", header=1)
 df.columns = ["date", "digit", "recipient"]
-digit_table = df[["digit", "recipient"]].groupby([("digit","recipient")]).count()
+digit_table = df[["digit", "recipient"]].groupby(["digit","recipient"]).count()
 digit_table.to_csv("digit_table.csv")
