@@ -60,8 +60,8 @@ bf_comparison = data.frame(x = c(1:9),
 
 ggplot(bf_comparison,
        aes(x = x)) +
-  geom_line(aes(y = obs, color = "Observed")) +
-  geom_line(aes(y = benford, color = "Benford")) +
+  geom_line(aes(y = benford, color = "Benford"), size = 1.5) +
+  geom_line(aes(y = obs, color = "Observed"), size = 1.5) +
   ylab("Probability") +
   xlab("Digit") +
   scale_x_continuous(breaks = seq(1, 9, by = 1))
@@ -93,3 +93,18 @@ sd(kld_scores)
 
 # How many KLD scores were above 2.5?
 sum(kld_scores > 2.5)
+
+# Bootstrap analysis
+boot_output <- read.csv(file = "bootstrap_output.csv", header = TRUE)
+head(boot_output)
+
+boot_output %>%
+  ggplot(aes(y = X0.975 - X0.25,
+             x = log10(n))) + 
+  geom_point(alpha = .05) + 
+  stat_smooth(se = FALSE) +
+  xlab("N transactions (Log10 scale)") +
+  ylab("")
+
+max(boot_output$n)
+max((cont_table))
