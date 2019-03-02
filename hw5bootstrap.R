@@ -35,7 +35,7 @@ boot_replicate = function(cont_vec, p = 1000){
   return(output)
 }
 
-cont.list <- split(cont_table[1:4,], seq(nrow(cont_table[1:4,])))
+cont.list <- split(cont_table, seq(nrow(cont_table)))
 
 output = parallel::mclapply(cont.list, boot_replicate, mc.cores = 2L)
 
