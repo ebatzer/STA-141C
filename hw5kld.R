@@ -1,12 +1,12 @@
 library(tidyverse)
 
-# BenFord distribution function
-BenFord <- function(x){
+# Benford distribution function
+Benford <- function(x){
   log10(1 + (1/x))
 }
 
 # Should sum to 1 
-sum(BenFord(1:9))
+sum(Benford(1:9))
 
 # Uniform distribution function
 Uniform <- function(x){
@@ -14,20 +14,11 @@ Uniform <- function(x){
 }
 
 # KLD function
-KLD = function(x, Qx = "BenFord"){
-  
-  if(Qx == "BenFord"){
-    pq = log(x / BenFord(c(1:9)))
-    pq[pq %in% c(Inf, -Inf)] = 0
-    k = sum(x * pq)
-    
-  }else if(Qx == "Uniform"){
-    
-    pq = log(x / Uniform(x))
-    pq[pq %in% c(Inf, -Inf)] = 0
-    k = sum(x * pq)
-    
-  }
+KLD = function(x, Qx = Benford(c(1:9))){
+  x = Uniform(1:9)
+  pq = log(x / Qx)
+  pq[pq %in% c(Inf, -Inf)] = 0
+  k = sum(x * pq)
   
   return(k)
   
@@ -57,13 +48,28 @@ obs_prop = obs_freq / sum(obs_freq)
 cont_prop = cont_table / rowSums(cont_table)
 
 # How many rows in contingency table?
-nrow(cont_table) #39479
+nrow(cont_table) #40781
+
+# Comparing with Benford's theoretical distribution
+KLD(obs_prop)
+
+bf_comparison = data.frame(x = c(1:9),
+           obs = obs_prop,
+           benford = Benford(c(1:9)))
+
+ggplot(bf_comparison,
+       aes(x = x)) +
+  geom_line(aes(y = obs, color = "Observed")) +
+  geom_line(aes(y = benford, color = "Benford")) +
+  ylab("Probability") +
+  xlab("Digit") +
+  scale_x_continuous(breaks = seq(1, 9, by = 1))
 
 # KLD of a uniform distribution
-KLD(Uniform(9))
+KLD(Uniform(c(1:9))) # 0.1912054
 
 # Calculating KLD of all funding recipients 
-kld_scores = apply(cont_prop, FUN = KLD, MARGIN = 1)
+kld_scores = apply(cont_prop, FUN = KLD, MARGIN = 1, Qx = obs_prop)
 
 # Histogram of scores
 data.frame(kld_scores) %>% 
