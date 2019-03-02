@@ -15,7 +15,7 @@ Uniform <- function(x){
 
 # KLD function
 KLD = function(x, Qx = Benford(c(1:9))){
-  x = Uniform(1:9)
+  
   pq = log(x / Qx)
   pq[pq %in% c(Inf, -Inf)] = 0
   k = sum(x * pq)
@@ -46,6 +46,7 @@ obs_prop = obs_freq / sum(obs_freq)
 
 # Creating proportional frequency table
 cont_prop = cont_table / rowSums(cont_table)
+write.csv("contingencytable.csv", x = cont_table)
 
 # How many rows in contingency table?
 nrow(cont_table) #40781
@@ -92,16 +93,3 @@ sd(kld_scores)
 
 # How many KLD scores were above 2.5?
 sum(kld_scores > 2.5)
-
-# Bootstrapping
-
-KLDboot = function(x){
-  n = sum(x)
-  randomsamp = tabulate(sample(x = c(1:9), size = n, prob = x / n, replace = TRUE))
-  KLD_boot = KLD(randomsamp / n)
-  return(KLD_boot)
-}
-
-boots = replicate(1000, KLDboot(cont_table[4,]))
-quantile(boots, c(.05, .50, .95)) 
-mean(boots)
