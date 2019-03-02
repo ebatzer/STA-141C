@@ -6,3 +6,5 @@
 *.zip
 *.html
 *.pdf
+*.txt
+*.Rmd

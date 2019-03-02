@@ -8,7 +8,7 @@ module load python3
 # For indices of column names
 cut --fields ${ACDATE},${TOTOBL},${PARREC} --delimiter , ${DATAFILE}|
 uniq |
-awk '${TOTOBL}>0' |
+awk '$2>0' |
 python3 ./STA-141C/hw5count.py |
 cat > digits.txt
 
