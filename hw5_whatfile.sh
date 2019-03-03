@@ -13,4 +13,4 @@ PARREC=52 # Parent recipient ID
 
 cut --fields ${ACDATE},${TOTOBL},${PARREC} --delimiter , ${DATAFILE} |
   awk '$3=="145863895"' |
-  cat > digits.txt
+  cat > foundrows.txt
