@@ -11,6 +11,6 @@ ACDATE=3 # Action date
 TOTOBL=8 # Total obligation
 PARREC=52 # Parent recipient ID
 
-cut --fields ${ACDATE},${TOTOBL},${PARREC} --delimiter , ${DATAFILE} |
-  awk '$3=="145863895"' |
+cut --delimiter , ${DATAFILE} |
+  awk '${PARREC}==145863895' |
   cat > foundrows.txt
