@@ -43,6 +43,7 @@ colnames(cont_table) = c(c(1:9))
 # Calculating overall observed frequency
 obs_freq = colSums(cont_table[,])
 obs_prop = obs_freq / sum(obs_freq)
+round(obs_prop, 3)
 
 # Creating proportional frequency table
 cont_prop = cont_table / rowSums(cont_table)
@@ -60,11 +61,13 @@ bf_comparison = data.frame(x = c(1:9),
 
 ggplot(bf_comparison,
        aes(x = x)) +
+  theme_bw() +
   geom_line(aes(y = benford, color = "Benford"), size = 1.5) +
   geom_line(aes(y = obs, color = "Observed"), size = 1.5) +
   ylab("Probability") +
   xlab("Digit") +
-  scale_x_continuous(breaks = seq(1, 9, by = 1))
+  scale_x_continuous(breaks = seq(1, 9, by = 1)) +
+  ggtitle("Observed vs. Benford Distribution")
 
 # KLD of a uniform distribution
 KLD(Uniform(c(1:9))) # 0.1912054
@@ -90,21 +93,27 @@ max(kld_scores)
 min(kld_scores)
 # SD
 sd(kld_scores)
-
 # How many KLD scores were above 2.5?
 sum(kld_scores > 2.5)
 
 # Bootstrap analysis
 boot_output <- read.csv(file = "bootstrap_output.csv", header = TRUE)
-head(boot_output)
 
+# Distribution of confidence intervals
+boot_output %>%
+  ggplot(aes(x = X0.975 - X0.25)) +
+  geom_histogram(bins = 50) +
+  xlab("CI Width (alpha = .05)") +
+  ylab("Frequency") +
+  theme_bw()
+
+# Plotting relationship with n
 boot_output %>%
   ggplot(aes(y = X0.975 - X0.25,
              x = log10(n))) + 
   geom_point(alpha = .05) + 
   stat_smooth(se = FALSE) +
-  xlab("N transactions (Log10 scale)") +
-  ylab("")
+  xlab("n transactions (Log10 scale)") +
+  ylab("CI Width (alpha = .05)") +
+  theme_bw()
 
-max(boot_output$n)
-max((cont_table))
