@@ -14,7 +14,6 @@ NAICS=42
 TRANSDESC=25
 RECIPNAME=51
 
-
-cut --fields ${ACDATE},${TOTOBL},${NAICS}, ${TRANSDESC}, ${RECIPNAME},${PARREC} --delimiter , ${DATAFILE} |
+cut --fields ${ACDATE},${TOTOBL},${NAICS},${TRANSDESC},${RECIPNAME},${PARREC} --delimiter , ${DATAFILE} |
   awk '$6==145863895' |
   cat > foundrows.txt
