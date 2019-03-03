@@ -8,10 +8,11 @@ def main():
 
     for row in reader:
         try:
-            row[1] = row[1][0]
+            if row[6] == 145863895:
+                writer.writerow(row)
         except IndexError:
             pass
-        writer.writerow(row)
+
 
 if __name__ == "__main__":
     main()

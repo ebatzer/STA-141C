@@ -7,13 +7,4 @@
 #SBATCH --job-name findrows
 
 DATAFILE="/scratch/transaction.csv"
-ACDATE=3 # Action date
-TOTOBL=8 # Total obligation
-PARREC=52 # Parent recipient ID
-NAICS=42
-TRANSDESC=25
-RECIPNAME=51
-
-cut --fields ${ACDATE},${TOTOBL},${NAICS},${TRANSDESC},${RECIPNAME},${PARREC} --delimiter , ${DATAFILE} |
-  awk '$6==145863895' |
-  cat > foundrows.txt
+grep -n --ignore-case 145863895 ${DATAFILE} > rowsubset.csv
