@@ -12,5 +12,5 @@ TOTOBL=8 # Total obligation
 PARREC=52 # Parent recipient ID
 
 cut --delimiter , ${DATAFILE} |
-  awk '${PARREC}==145863895' |
+  awk '$52==145863895' |
   cat > foundrows.txt
